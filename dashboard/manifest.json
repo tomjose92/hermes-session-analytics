@@ -1,0 +1,15 @@
+{
+  "name": "session-analytics",
+  "label": "Session Analytics",
+  "description": "Cost analytics, tool usage breakdown, token metrics, and Slack user attribution for Hermes sessions.",
+  "icon": "BarChart3",
+  "version": "0.1.0",
+  "tab": {
+    "path": "/session-analytics",
+    "position": "after:sessions"
+  },
+  "slots": [],
+  "entry": "dist/index.js",
+  "css": "dist/style.css",
+  "api": "plugin_api.py"
+}
