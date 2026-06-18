@@ -1,8 +1,53 @@
 # Session Analytics — Hermes dashboard plugin
 
-A Hermes Agent **dashboard plugin** that adds a Session Analytics tab to the web
-dashboard: cost analytics, tool-usage breakdown, token metrics, and Slack user
-attribution for Hermes sessions (read from `state.db`).
+A Hermes Agent **dashboard plugin** that adds an attribution-aware Session
+Analytics tab to the web dashboard: cost, token, and tool analytics broken down
+by user, platform, and model — plus a cleaned-up conversation view with Slack
+links. It reads directly from the local Hermes state store (`state.db`) and the
+session routing index (`sessions/sessions.json`); it never calls an LLM and
+opens the database read-only.
+
+It installs as a tab right after the native **Sessions** tab and is designed to
+complement, not replace, the built-in dashboard.
+
+## What it does
+
+Each capability is backed by a route under
+`/api/plugins/session-analytics/` ([`dashboard/plugin_api.py`](dashboard/plugin_api.py)):
+
+- **Overview** (`/overview`) — total sessions, messages, tool/api calls, tokens
+  (input/output/cache/reasoning), and estimated cost; broken down by source and
+  model, with a daily time-series.
+- **Cost analytics** (`/costs`) — cost by model, source, user, and platform
+  (webhooks + crons), a daily cost series, and the **top-N most expensive
+  sessions** (filterable by source).
+- **Sessions list** (`/sessions`) — filter by source / model / user / minimum
+  cost / active; sort by recency, cost, tokens, messages, or duration; with
+  computed fields like tokens-per-message, live-session detection, and resolved
+  display names.
+- **Session detail** (`/sessions/{id}/detail`, `/tools`, `/timeline`) — a cleaned
+  conversation (gateway prefixes parsed out into author + context), per-session
+  tool breakdown with **average latency**, a message timeline with inter-message
+  latency, the list of **skills triggered**, and an **"Open in Slack"** deep
+  link.
+- **Users** (`/users`) — per-user session count, cost, tokens, messages, and tool
+  calls, with Slack display names and a **human / automation / cron / system**
+  classification.
+- **Models** (`/models`) — per-model and per-`billing_provider` rollups of
+  sessions, cost, tokens, and call counts.
+- **Flexible time ranges** — presets, `days` (up to 365), `seconds`, or a custom
+  `since`/`until` window on every analytics endpoint.
+
+## How it differs from the native Hermes dashboard
+
+The native dashboard's **Analytics** page offers fixed 7/30/90-day token and cost
+estimates (now hidden by default), and its **Sessions** page is the place to
+browse and full-text-search conversations. This plugin focuses on **cost
+attribution** — who/what spent it, the priciest sessions, tool usage and latency,
+and a readable conversation view with Slack links and custom time ranges.
+
+See [COMPARISON.md](./COMPARISON.md) for a full feature-by-feature breakdown and
+the Slack/Hermes-specific assumptions.
 
 ## Layout
 
@@ -42,3 +87,11 @@ The Hermes Kite container clones/pulls this repo into
 `/opt/data/plugins/session-analytics` on every boot, so each deploy/restart picks
 up the latest `main`. Pin a specific ref with the `SESSION_ANALYTICS_PLUGIN_REF`
 env var.
+
+## Data sources & assumptions
+
+Reads `state.db` (read-only) and `sessions/sessions.json`, both relative to
+`HERMES_HOME` (falling back to `~/.hermes`). The aggregation is generic to any
+Hermes deployment; the attribution and conversation-cleanup logic is tuned for a
+Slack-fronted Hermes and degrades gracefully elsewhere — see the assumptions
+section in [COMPARISON.md](./COMPARISON.md).
