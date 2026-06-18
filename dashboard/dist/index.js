@@ -122,12 +122,14 @@
     return h("div", { className: "sa-time-picker" },
       h("div", { className: "sa-time-presets" },
         TIME_RANGES.map(function (r) {
+          var isActive = selected === r.id;
           return h(Button, {
             key: r.id,
-            variant: selected === r.id ? "default" : "outline",
+            variant: isActive ? "default" : "outline",
             size: "sm",
             onClick: function () { onChange(r.id); },
-            className: "sa-time-btn",
+            className: "sa-time-btn" + (isActive ? " sa-time-btn--active" : ""),
+            "aria-pressed": isActive,
           }, r.label);
         })
       ),

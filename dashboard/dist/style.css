@@ -75,6 +75,21 @@
   font-size: 0.75rem !important;
   padding: 0.15rem 0.4rem !important;
   min-width: 0 !important;
+  opacity: 0.5 !important;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.sa-time-btn:hover {
+  opacity: 0.8 !important;
+}
+
+/* Selected preset — clearly distinguished from the dimmed, unselected ones. */
+.sa-time-btn--active {
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 0 2px var(--color-ring, #6fb39a),
+              0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-1px);
 }
 
 .sa-custom-range {
