@@ -1,8 +1,8 @@
 # Session Analytics vs. the native Hermes dashboard
 
-This document explains how the **Session Analytics** plugin differs from the
-analytics that ship with Hermes Agent out of the box, and which to reach for
-when.
+This document explains how the **Session Analytics** plugin improves on the
+analytics that ship with Hermes Agent out of the box. The goal is for the plugin
+to match and surpass the native dashboard's session insights.
 
 ## Scope
 
@@ -27,20 +27,8 @@ session routing index (`sessions/sessions.json`).
 | Tool analytics | `tool_call_count` per session only | **Global** tool usage and **per-session** tool breakdown, each with **average latency** (computed from request→result timestamps) |
 | Conversation view | Renders the raw stored message — including the `[Thread context …]`, `[Replying to: …]`, and `[sender]` prefixes the gateway injects | Parses those prefixes into a clean message + **author** + a collapsible **context** block, adds an **"Open in Slack"** deep link, and lists **skill triggers** |
 | Per-model view | Per-model token + cost table | Per-model **and** `billing_provider` rollups (sessions, cost, input/output/cache/reasoning tokens, messages, tool/api calls) |
-| Full-text search | FTS5 search across all message content | Not provided — use the native Sessions search; the two are complementary |
-| Session resume / title edit | Yes (native session management) | No — read-only analytics |
-
-## When to use which
-
-- **Native Sessions page** — browsing conversations, full-text search across
-  history, editing titles, resuming sessions. It is the system of record for
-  *reading* sessions.
-- **This plugin** — answering "where is the spend going?": cost attribution per
-  user / platform / model, the most expensive sessions, tool usage and latency,
-  and a cleaned-up conversation view with Slack links.
-
-They are designed to coexist — the plugin adds a tab positioned right after the
-native Sessions tab (`"position": "after:sessions"` in `dashboard/manifest.json`).
+| Full-text search | FTS5 search across all message content | Not yet — a gap to close |
+| Session resume / title edit | Yes (native session management) | Read-only analytics |
 
 ## Assumptions — what's tuned for a Slack-fronted Hermes
 

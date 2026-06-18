@@ -7,8 +7,8 @@ links. It reads directly from the local Hermes state store (`state.db`) and the
 session routing index (`sessions/sessions.json`); it never calls an LLM and
 opens the database read-only.
 
-It installs as a tab right after the native **Sessions** tab and is designed to
-complement, not replace, the built-in dashboard.
+It installs as a tab in the web dashboard and aims to be a richer, more capable
+take on session insights than what ships with Hermes out of the box.
 
 ## What it does
 
@@ -41,10 +41,10 @@ Each capability is backed by a route under
 ## How it differs from the native Hermes dashboard
 
 The native dashboard's **Analytics** page offers fixed 7/30/90-day token and cost
-estimates (now hidden by default), and its **Sessions** page is the place to
-browse and full-text-search conversations. This plugin focuses on **cost
-attribution** — who/what spent it, the priciest sessions, tool usage and latency,
-and a readable conversation view with Slack links and custom time ranges.
+estimates (now hidden by default). This plugin goes further — adding cost
+attribution per user / platform / model, the priciest sessions, tool usage and
+latency, flexible time ranges, and a cleaned-up conversation view with Slack
+links.
 
 See [COMPARISON.md](./COMPARISON.md) for a full feature-by-feature breakdown and
 the Slack/Hermes-specific assumptions.
