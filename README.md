@@ -10,6 +10,10 @@ opens the database read-only.
 It installs as a tab in the web dashboard and aims to be a richer, more capable
 take on session insights than what ships with Hermes out of the box.
 
+> **Platform support:** the attribution and conversation-cleanup features are
+> currently focused on **Slack**. Improvements for **Discord** and **WhatsApp**
+> are coming soon. Cost, token, and tool analytics already work for any platform.
+
 ## What it does
 
 Each capability is backed by a route under
