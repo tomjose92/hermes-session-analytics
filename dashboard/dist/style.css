@@ -208,17 +208,49 @@
   padding: 0;
 }
 
-.sa-spark-bar {
+/* Full-height column so the entire bar slot is hoverable, not just the
+   (possibly tiny) visible bar — this is what makes the tooltip reliable. */
+.sa-spark-col {
   flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  cursor: default;
+}
+
+.sa-spark-bar {
+  width: 100%;
   background: var(--color-primary, #ffe6cb);
   border-radius: 1px 1px 0 0;
-  min-height: 1px;
-  opacity: 0.6;
+  min-height: 2px;
+  opacity: 0.55;
   transition: opacity 0.2s;
 }
 
-.sa-spark-bar:hover {
+.sa-spark-col:hover .sa-spark-bar {
   opacity: 1;
+}
+
+/* Chart hover tooltip */
+.sa-chart-hover {
+  position: relative;
+}
+
+.sa-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  pointer-events: none;
+  background: var(--color-popover, rgba(20, 30, 26, 0.97));
+  color: var(--color-popover-foreground, #ffe6cb);
+  border: 1px solid var(--color-border, rgba(255, 230, 203, 0.18));
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Tables */

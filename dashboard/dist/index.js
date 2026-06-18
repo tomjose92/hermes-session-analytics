@@ -199,47 +199,92 @@
     );
   }
 
+  // ─── Hover tooltip helper (shared by charts) ──────────────────────
+  // Tracks a cursor-anchored tooltip positioned relative to a chart
+  // container. Returns a ref to attach to the container, the current tip
+  // state, and handlers to show/clear it on individual data cells.
+  var useRef = (hooks && hooks.useRef) || React.useRef;
+  function useHoverTip() {
+    var ref = useRef(null);
+    var _t = useState(null), tip = _t[0], setTip = _t[1];
+    function show(e, text) {
+      var el = ref.current;
+      if (!el) return;
+      var rect = el.getBoundingClientRect();
+      setTip({ text: text, x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
+    function clear() { setTip(null); }
+    return { ref: ref, tip: tip, show: show, clear: clear };
+  }
+
+  function tipNode(tip) {
+    if (!tip) return null;
+    return h("div", {
+      className: "sa-tooltip",
+      style: { left: tip.x + "px", top: tip.y + "px" },
+    }, tip.text);
+  }
+
   // ─── Simple Bar Chart (pure CSS, no Chart.js dependency) ───────────
   function BarChart(props) {
     var data = props.data || [];
     var labelKey = props.labelKey || "label";
     var valueKey = props.valueKey || "value";
+    var ht = useHoverTip();
     var maxVal = Math.max.apply(null, data.map(function (d) { return d[valueKey] || 0; }));
     if (maxVal === 0) maxVal = 1;
 
-    return h("div", { className: "sa-bar-chart" },
+    return h("div", { className: "sa-bar-chart sa-chart-hover", ref: ht.ref },
       data.map(function (d, i) {
         var pct = ((d[valueKey] || 0) / maxVal) * 100;
         var label = d[labelKey] || "";
         var display = props.formatValue ? props.formatValue(d[valueKey]) : String(d[valueKey] || 0);
-        return h("div", { key: i, className: "sa-bar-row" },
+        var text = label + ": " + display;
+        return h("div", {
+          key: i,
+          className: "sa-bar-row",
+          title: text,
+          onMouseEnter: function (e) { ht.show(e, text); },
+          onMouseMove: function (e) { ht.show(e, text); },
+          onMouseLeave: ht.clear,
+        },
           h("div", { className: "sa-bar-label", title: label }, label),
           h("div", { className: "sa-bar-track" },
             h("div", { className: "sa-bar-fill", style: { width: pct + "%" } })
           ),
           h("div", { className: "sa-bar-value" }, display)
         );
-      })
+      }),
+      tipNode(ht.tip)
     );
   }
 
-  // ─── Sparkline (pure CSS, horizontal dots) ─────────────────────────
+  // ─── Sparkline (pure CSS bars with full-height hover targets) ──────
   function Sparkline(props) {
     var data = props.data || [];
     var valueKey = props.valueKey || "value";
+    var ht = useHoverTip();
     var maxVal = Math.max.apply(null, data.map(function (d) { return d[valueKey] || 0; }));
     if (maxVal === 0) maxVal = 1;
 
-    return h("div", { className: "sa-sparkline" },
+    function fmt(v) { return props.formatValue ? props.formatValue(v) : String(v); }
+
+    return h("div", { className: "sa-sparkline sa-chart-hover", ref: ht.ref },
       data.map(function (d, i) {
         var pct = ((d[valueKey] || 0) / maxVal) * 100;
+        var text = (d.day || "") + " · " + fmt(d[valueKey] || 0);
         return h("div", {
           key: i,
-          className: "sa-spark-bar",
-          style: { height: pct + "%" },
-          title: (d.day || "") + ": " + (props.formatValue ? props.formatValue(d[valueKey]) : d[valueKey]),
-        });
-      })
+          className: "sa-spark-col",
+          title: text,
+          onMouseEnter: function (e) { ht.show(e, text); },
+          onMouseMove: function (e) { ht.show(e, text); },
+          onMouseLeave: ht.clear,
+        },
+          h("div", { className: "sa-spark-bar", style: { height: Math.max(pct, 1) + "%" } })
+        );
+      }),
+      tipNode(ht.tip)
     );
   }
 
